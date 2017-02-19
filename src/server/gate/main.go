@@ -1,47 +1,49 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/paulstuart/ping"
+	"github.com/Sirupsen/logrus"
+	// "github.com/paulstuart/ping"
 	"os"
 	"strconv"
 	"time"
 )
 
 const (
-	CONST_SYS_PORT = ":18666"
-	CONST_SYS_NAME = "GATE"
+	CONST_SYS_LOCAL_PORT = ":18666"
+	CONST_SYS_KING_PORT  = ":16888"
+	CONST_SYS_LOCAL_NAME = "GATE"
 )
 
 var (
-	address_king string
-	model        int
+	log         = logrus.New()
+	addressKing string
+	model       int
+	masterList  []string
 )
 
 func main() {
 
-	// 启动传参数，必须传入king服务器ip和启动模式:0=正常模式；1=debug模式
+	// 初始化启动传参数，必须传入king服务器ip和启动模式:0=正常模式；1=debug模式
 	arg_num := len(os.Args)
 
-	if arg_num < 4 {
+	if arg_num < 3 {
 		log.Println("传入参数不足,服务终止")
-		os.Exit(1)
 	}
 
-	address_king = os.Args[1]
-	if !ping.Ping(address_king, 1) {
-		log.Println("king服务器未上线,服务终止")
-		os.Exit(1)
-	}
+	addressKing = os.Args[1]
+	// if !ping.Ping(addressKing, 1) {
+	// 	log.Println("king服务器未上线,服务终止")
+	// }
 
 	model, err := strconv.Atoi(os.Args[2])
 	if err != nil {
 		log.Errorln(err)
 		log.Println("模式参数错误，服务终止")
-		os.Exit(1)
 	}
 
-	// 获取系统
-	log.Println(address_king, model)
+	// 获取king服务器相关配置
+	rpc_king_init()
+
+	log.Println(addressKing, model)
 	time.Sleep(time.Hour)
 }
